@@ -1,0 +1,20 @@
+[Unit]
+Description=Miningcore Backend Service
+After=network.target
+
+[Service]
+Type=forking
+User=pool
+Group=pool
+WorkingDirectory=/home/pool
+ExecStart=/usr/bin/screen -dmS miningcore /home/pool/miningcore/build/Miningcore -c /home/pool/pool.json
+ExecStop=/usr/bin/screen -XS miningcore quit
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=10s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
