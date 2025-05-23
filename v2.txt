@@ -1,2 +1,25 @@
+#!/bin/bash
 
-vmess://eyJhZGQiOiI0NS4xMTguMTQ2LjQiLCJhaWQiOiIwIiwiYWxwbiI6IiIsImZwIjoiIiwiaG9zdCI6Im0udGlrdG9rLmNvbSIsImlkIjoiOTU5NmZlOTMtZTYxNS00YTIxLWNjZDUtNjNmMDM3Yzg2YjY5IiwibmV0IjoidGNwIiwicGF0aCI6Ii8iLCJwb3J0IjoiODAiLCJwcyI6IkTGsMahbmcg8J+Hu/Cfh7MiLCJzY3kiOiJhdXRvIiwic25pIjoiIiwidGxzIjoiIiwidHlwZSI6Imh0dHAiLCJ2IjoiMiJ9
+echo "==================== CPU Info ===================="
+lscpu | grep -E '^Model name|^CPUs|^Thread|^Core|^Socket'
+
+echo ""
+echo "==================== RAM Info ===================="
+free -h
+
+echo ""
+echo "==================== GPU Info ===================="
+if command -v nvidia-smi &> /dev/null; then
+    echo "GPU NVIDIA (dùng nvidia-smi):"
+    nvidia-smi
+else
+    echo "GPU hiển thị (dùng lspci):"
+    lspci | grep -i vga
+    echo ""
+    echo "Chi tiết GPU (dùng lshw):"
+    if command -v lshw &> /dev/null; then
+        sudo lshw -C display | grep -E 'product|vendor|configuration|driver'
+    else
+        echo "Bạn cần cài đặt lshw: sudo apt install lshw"
+    fi
+fi
