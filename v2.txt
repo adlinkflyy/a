@@ -1,110 +1,72 @@
-Dưới đây là hướng dẫn chi tiết để bạn cài đặt mô hình Gemma 7B GGUF và thiết lập Ollama cùng Open WebUI trên hệ điều hành Ubuntu 22.04, sử dụng CPU (không cần GPU). Với cấu hình 2 thread x 8 core 2.20GHz và 58GB RAM, bạn hoàn toàn có thể chạy mô hình này hiệu quả.
+Lỗi Unit docker.service is masked nghĩa là dịch vụ Docker đã bị "masked" (vô hiệu hoá hoàn toàn), khiến hệ thống không thể khởi động nó. Điều này thường xảy ra nếu Docker bị cài đặt sai hoặc bị chặn bởi ai đó/vai trò hệ thống.
 
 
 ---
 
-🔗 Bước 1: Tải mô hình Gemma 7B GGUF
+✅ Cách khắc phục
 
-Bạn có thể tải mô hình Gemma 7B ở định dạng GGUF từ Hugging Face:
+Thực hiện các bước sau để unmask và khởi động Docker:
 
-MaziyarPanahi/gemma-7b-GGUF: 
+Bước 1: Unmask Docker
 
-brittlewis12/gemma-7b-GGUF: 
+sudo systemctl unmask docker
 
+Bước 2: Khởi động lại Docker
 
-Lưu ý: Với 58GB RAM, bạn nên chọn phiên bản nén Q4_K_M hoặc Q5_K_M để tối ưu hiệu suất và sử dụng bộ nhớ hiệu quả.
+sudo systemctl start docker
 
+Bước 3: Kích hoạt Docker khởi động cùng hệ thống (nếu cần)
 
----
+sudo systemctl enable docker
 
-⚙️ Bước 2: Cài đặt Ollama
+Bước 4: Kiểm tra trạng thái Docker
 
-Ollama là công cụ giúp bạn chạy các mô hình LLM một cách dễ dàng. Để cài đặt Ollama trên Ubuntu 22.04, bạn có thể sử dụng lệnh sau:
-
-curl -fsSL https://ollama.com/install.sh | sh
-
-Sau khi cài đặt, kiểm tra phiên bản để đảm bảo Ollama đã được cài đặt thành công:
-
-ollama --version
-
-Lưu ý: Ollama hỗ trợ chạy mô hình trên CPU, nhưng hiệu suất sẽ tốt hơn nếu có GPU. Tuy nhiên, với cấu hình hiện tại của bạn, việc chạy trên CPU vẫn khả thi.
+sudo systemctl status docker
 
 
 ---
 
-🌐 Bước 3: Cài đặt Docker (Yêu cầu cho Open WebUI)
+Nếu sau khi unmask và start vẫn không chạy được, có thể Docker đã bị cài đặt sai. Khi đó bạn có thể gỡ hoàn toàn và cài lại Docker:
 
-Open WebUI sử dụng Docker để triển khai. Để cài đặt Docker trên Ubuntu 22.04, thực hiện các bước sau:
 
-1. Cập nhật danh sách gói và cài đặt các gói phụ thuộc:
+---
+
+🔁 Gỡ và cài lại Docker (nếu cần)
+
+Gỡ Docker:
+
+sudo apt remove docker docker-engine docker.io containerd runc
+
+Cài lại Docker theo cách chính thức:
 
 sudo apt update
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
+sudo apt install ca-certificates curl gnupg lsb-release
 
+Thêm key GPG và repo chính thức:
 
-2. Thêm khóa GPG chính thức của Docker:
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-
-3. Thêm kho lưu trữ Docker vào APT sources:
-
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-
-
-4. Cập nhật danh sách gói và cài đặt Docker:
+Cài Docker:
 
 sudo apt update
-sudo apt install docker-ce
-
-
-5. Kiểm tra phiên bản Docker để đảm bảo cài đặt thành công:
-
-docker --version
-
-
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 
 ---
 
-🖥️ Bước 4: Cài đặt Open WebUI
-sudo docker run -d --network=host -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
- hình đã cài đặt để bắt đầu sử dụng.
+Sau đó thử lại:
 
-
-
-
----
-
-📥 Bước 5: Tải và sử dụng mô hình trong Ollama
-
-Sau khi đã cài đặt Ollama và Open WebUI, bạn có thể tải mô hình Gemma 7B vào Ollama:
-
-1. Tải mô hình Gemma 7B GGUF từ Hugging Face như đã hướng dẫn ở Bước 1.
-
-
-2. Sử dụng lệnh sau để thêm mô hình vào Ollama:
-
-ollama create gemma7b -f /đường/dẫn/đến/tập_tin.gguf
-
-Thay /đường/dẫn/đến/tập_tin.gguf bằng đường dẫn thực tế đến tập tin mô hình bạn đã tải về.
-
-
-3. Sau khi mô hình được thêm, bạn có thể bắt đầu sử dụng nó thông qua giao diện dòng lệnh của Ollama hoặc thông qua Open WebUI.
-
-
+sudo systemctl start docker
+sudo systemctl status docker
 
 
 ---
 
-✅ Tổng kết
-
-Cấu hình của bạn đủ mạnh để chạy mô hình Gemma 7B GGUF trên CPU.
-
-Ollama giúp bạn dễ dàng quản lý và chạy các mô hình LLM.
-
-Open WebUI cung cấp giao diện web thân thiện để tương tác với mô hình.
-
-
-Nếu bạn cần thêm hỗ trợ hoặc gặp vấn đề trong quá trình cài đặt, hãy chia sẻ chi tiết để mình có thể giúp đỡ thêm!
+Cho mình biết nếu bạn muốn mình gửi lại đoạn lệnh đầy đủ để gỡ + cài lại Docker nhé!
 
