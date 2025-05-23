@@ -1,1 +1,98 @@
-https://huggingface.co/TheBloke/Nous-Hermes-13B-GGUF
+Tuyệt vời! Dưới đây là hướng dẫn chi tiết cách cài đặt và chạy mô hình OpenHermes 13B.Q6_K.gguf bằng text-generation-webui trên Ubuntu:
+
+
+---
+
+Bước 1: Cài đặt các gói cần thiết
+
+Mở Terminal và chạy:
+
+sudo apt update && sudo apt install -y git python3 python3-pip
+
+
+---
+
+Bước 2: Tải text-generation-webui
+
+git clone https://github.com/oobabooga/text-generation-webui.git
+cd text-generation-webui
+
+
+---
+
+Bước 3: Tải mô hình GGUF
+
+1. Tạo thư mục cho mô hình:
+
+
+
+mkdir -p models/OpenHermes-13B
+
+2. Di chuyển file OpenHermes-13B.Q6_K.gguf bạn đã tải vào thư mục trên.
+Ví dụ: nếu file nằm ở thư mục ~/Downloads, dùng:
+
+
+
+mv ~/Downloads/OpenHermes-13B.Q6_K.gguf models/OpenHermes-13B/
+
+
+---
+
+Bước 4: Cài đặt Python môi trường
+
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+
+---
+
+Bước 5: Cài đặt GGUF backend (llama.cpp)
+
+Chạy lệnh sau trong thư mục text-generation-webui:
+
+bash download-gguf-backend.sh
+
+
+---
+
+Bước 6: Chạy mô hình
+
+Kích hoạt môi trường ảo (nếu chưa):
+
+source venv/bin/activate
+
+Sau đó chạy WebUI:
+
+python3 server.py --model OpenHermes-13B
+
+
+---
+
+Bước 7: Truy cập giao diện web
+
+Mở trình duyệt và truy cập:
+http://localhost:7860
+
+Bạn sẽ thấy giao diện chat với mô hình OpenHermes 13B Q6_K.
+
+
+---
+
+Tùy chọn nâng cao
+
+Nếu bạn muốn kết nối từ xa (qua điện thoại):
+→ Mở cổng 7860 trên firewall hoặc dùng ngrok, tailscale, hoặc cài HTTPS proxy.
+
+Thêm --listen để mở ra ngoài:
+
+
+python3 server.py --model OpenHermes-13B --listen
+
+
+---
+
+Bạn có muốn mình hướng dẫn mở truy cập từ điện thoại (trong mạng LAN hoặc qua internet)?
+Hoặc cấu hình plugin tìm kiếm Google trong WebUI?
+
+
